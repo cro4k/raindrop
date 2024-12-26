@@ -65,6 +65,8 @@ func NewListener(options ...ListenerOption) *Listener {
 
 func (l *Listener) Accept(ctx context.Context) (raindrop.Conn, error) {
 	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
 	case c, ok := <-l.ch:
 		if !ok {
 			return nil, io.EOF
