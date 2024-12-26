@@ -1,4 +1,4 @@
-package tcp
+package net
 
 import (
 	"context"
@@ -80,8 +80,8 @@ func (l *Listener) accept(ctx context.Context) (rc raindrop.Conn, err error) {
 	return cc, nil
 }
 
-func NewListener(addr string, opts ...Option) (*Listener, error) {
-	l, err := net.Listen("tcp", addr)
+func NewListener(network, addr string, opts ...Option) (*Listener, error) {
+	l, err := net.Listen(network, addr)
 	if err != nil {
 		return nil, err
 	}

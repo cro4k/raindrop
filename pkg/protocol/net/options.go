@@ -1,4 +1,4 @@
-package tcp
+package net
 
 const (
 	DefaultMaxMessageSize    = 1 << 22
