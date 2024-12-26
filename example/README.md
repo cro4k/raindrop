@@ -26,7 +26,7 @@ and you'll see in second client terminal:
 
 ## Clusters
 
-> Note: To run the cluster example, you should prepare a redis server. 
+> Note: To run the cluster example, you should prepare a redis server that serving on 'localhost:6379', or modify the source code as you wish.
 
 1. start a server:
 ```shell
