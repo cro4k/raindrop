@@ -133,9 +133,9 @@ func (s *Server) handleConn(conn Conn) {
 	// create new connection
 	client := NewClient(
 		conn,
-		WithHandler(s.onClientMessage(id)),
-		WithErrorHandler(s.onClientError(id)),
-		WithCloseHandler(s.onClientClose(id)),
+		WithClientOnMessageHandler(s.onClientMessage(id)),
+		WithClientOnErrorHandler(s.onClientError(id)),
+		WithClientOnCloseHandler(s.onClientClose(id)),
 	)
 
 	if s.tunnel != nil {

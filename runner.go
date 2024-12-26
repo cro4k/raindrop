@@ -7,7 +7,7 @@ import (
 
 type (
 	Runner interface {
-		Run(ctx context.Context)
+		Run(ctx context.Context) error
 	}
 
 	RunnerGroup struct {
@@ -19,6 +19,6 @@ func (rg *RunnerGroup) Run(ctx context.Context, runner Runner) {
 	rg.Add(1)
 	go func() {
 		defer rg.Done()
-		runner.Run(ctx)
+		_ = runner.Run(ctx)
 	}()
 }
