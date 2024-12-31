@@ -107,7 +107,7 @@ func (s *Server) Send(ctx context.Context, id string, data []byte) error {
 
 func (s *Server) Serve(ctx context.Context) error {
 	for {
-		conn, err := s.listener.Accept(ctx)
+		conn, err := s.listener.Accept(s.ctx)
 		if err != nil {
 			return err
 		}
