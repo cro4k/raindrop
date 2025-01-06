@@ -4,16 +4,16 @@
 
 1. start a server
 ```shell
-go run single/main.go -http :8080
+go run single/main.go
 ```
 2. start a client
 
 ```shell
-go run client/main.go -server localhost:8080 -id 1
+go run client/main.go -server localhost:8000 -id 1
 ```
 3. start another client
 ```shell
-go run client/main.go -server localhost:8080 -id 2
+go run client/main.go -server localhost:8000 -id 2
 ```
 4. And now you can send messages between two clients by typing `[id] [conent]` in client command line terminal. For example, type in first client terminal:
 ```shell
@@ -30,12 +30,12 @@ and you'll see in second client terminal:
 
 1. start a server:
 ```shell
-go run cluster/main.go -http :8081 -grpc :9001
+go run cluster/main.go -http 127.0.0.1:8081 -grpc 127.0.0.1:9001
 ```
 
 2. start another server:
 ```shell
-go run cluster/main.go -http :8082 -grpc :9002
+go run cluster/main.go -http 127.0.0.1:8082 -grpc 127.0.0.1:9002
 ```
 
 3. start a client connected to first server:
@@ -55,4 +55,3 @@ and you'll see in second client terminal:
 ```shell
 >>: {"to":"2","from":"1","message":"hello"}
 ```
-

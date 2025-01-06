@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option go_package = "./tunnel";
+option go_package = "./cluster";
 
-service RaindropTunnel {
+service Service {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
   rpc GetVersion(GetVersionRequest) returns (GetVersionResponse);
 }

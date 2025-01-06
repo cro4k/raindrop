@@ -71,7 +71,7 @@ func main() {
 		m := messages.Message{
 			To:      to,
 			From:    clientID,
-			Message: message,
+			Content: message,
 		}
 		err = conn.Write(context.Background(), websocket.MessageBinary, m.JSON())
 		if err != nil {

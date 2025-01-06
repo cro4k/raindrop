@@ -1,5 +1,5 @@
 # Raindrop
 
-Raindrop is a distributed long connection network framework with highly customizable options.
+Raindrop is a simple IM(Instant Messaging) server.
 
 See more info in [example](./example)
