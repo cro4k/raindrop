@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/cro4k/raindrop"
 	"github.com/cro4k/raindrop/core"
 	"github.com/cro4k/raindrop/example/messages"
 	"github.com/cro4k/raindrop/protocol"

@@ -8,10 +8,12 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/cro4k/raindrop"
 	"github.com/cro4k/raindrop/cluster"
 	"github.com/cro4k/raindrop/core"
 	"github.com/cro4k/raindrop/example/messages"
 	"github.com/cro4k/raindrop/protocol"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
