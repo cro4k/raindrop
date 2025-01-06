@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/cro4k/raindrop/core"
+	"github.com/cro4k/raindrop/v1/core"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

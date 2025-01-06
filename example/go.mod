@@ -3,7 +3,7 @@ module github.com/cro4k/raindrop/example
 go 1.23
 
 require (
-	github.com/cro4k/raindrop v0.0.0
+	github.com/cro4k/raindrop/v1 v0.0.0
 	github.com/redis/go-redis/v9 v9.7.0
 )
 

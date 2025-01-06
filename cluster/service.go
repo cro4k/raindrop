@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/cro4k/raindrop/core"
+	"github.com/cro4k/raindrop/v1/core"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )

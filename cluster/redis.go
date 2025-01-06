@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cro4k/raindrop/core"
+	"github.com/cro4k/raindrop/v1/core"
 	"github.com/redis/go-redis/v9"
 )
 
