@@ -1,4 +1,4 @@
-module github.com/cro4k/raindrop/v1
+module github.com/cro4k/raindrop
 
 go 1.23
 

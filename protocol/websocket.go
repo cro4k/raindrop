@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/coder/websocket"
-	"github.com/cro4k/raindrop/v1/core"
+	"github.com/cro4k/raindrop/core"
 	"github.com/google/uuid"
 )
 

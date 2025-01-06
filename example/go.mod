@@ -3,7 +3,6 @@ module github.com/cro4k/raindrop/example
 go 1.23
 
 require (
-	github.com/cro4k/raindrop/v1 v0.0.0
 	github.com/redis/go-redis/v9 v9.7.0
 )
 
@@ -20,5 +19,3 @@ require (
 	google.golang.org/grpc v1.69.2 // indirect
 	google.golang.org/protobuf v1.36.1 // indirect
 )
-
-replace github.com/cro4k/raindrop v0.0.0 => ../

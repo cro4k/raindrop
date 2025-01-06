@@ -7,9 +7,9 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/cro4k/raindrop/core"
 	"github.com/cro4k/raindrop/example/messages"
-	"github.com/cro4k/raindrop/v1/core"
-	"github.com/cro4k/raindrop/v1/protocol"
+	"github.com/cro4k/raindrop/protocol"
 )
 
 // This example is shown send message from clint-to-server side by websocket connection, so the MQ is skipped.

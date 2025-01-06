@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cro4k/raindrop/v1/core"
+	"github.com/cro4k/raindrop/core"
 	"golang.org/x/sync/errgroup"
 )
 
