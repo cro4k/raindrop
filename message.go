@@ -8,6 +8,7 @@ import (
 
 type (
 	RawMessage struct {
+		ID        string
 		Data      []byte
 		Timestamp time.Time
 	}
