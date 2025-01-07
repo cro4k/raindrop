@@ -90,11 +90,11 @@ func (r *Raindrop) serve(ctx context.Context) error {
 	})
 }
 
-func (r *Raindrop) Send(ctx context.Context, data []byte) error {
+func (r *Raindrop) Send(ctx context.Context, id string, data []byte) error {
 	if r.pub == nil {
 		return fmt.Errorf("message publisher is not set")
 	}
-	return r.pub.Publish(ctx, &RawMessage{Data: data, Timestamp: time.Now()})
+	return r.pub.Publish(ctx, &RawMessage{ID: id, Data: data, Timestamp: time.Now()})
 }
 
 func (r *Raindrop) Start(ctx context.Context) error {
