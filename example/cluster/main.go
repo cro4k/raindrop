@@ -9,10 +9,10 @@ import (
 	"os/signal"
 
 	"github.com/cro4k/raindrop"
-	"github.com/cro4k/raindrop/cluster"
 	"github.com/cro4k/raindrop/core"
 	"github.com/cro4k/raindrop/example/messages"
 	"github.com/cro4k/raindrop/protocol"
+	"github.com/cro4k/raindrop/registry"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -35,7 +35,7 @@ func init() {
 // server-to-client side communicate
 func main() {
 	// the multi-services registry and discovery
-	clusterService := cluster.NewRedisClusterService(
+	registryService := registry.NewRedisRegistry(
 		redis.NewUniversalClient(&redis.UniversalOptions{Addrs: []string{redisServer}}),
 	)
 
@@ -43,11 +43,16 @@ func main() {
 	srv := core.NewServer(
 		protocol.NewWebsocketListener(protocol.WithListenOn(httpListenOn)),
 		core.WithOnClientMessage(onClientMessage),
-		core.WithClusterService(grpcListenOn, cluster.FromGRPCService(clusterService)),
+		core.WithRegistryService(grpcListenOn, registry.FromGRPCRegistryService(registryService)),
 	)
 
 	// the connector for multi-servers in the cluster
-	grpcServer := cluster.NewGRPCServer(srv, grpcListenOn, "0.0.1")
+	grpcServer := registry.NewGRPCRegistryServer(srv, "0.0.1")
+	closer, err := registry.StartGRPCRegistryServer(grpcListenOn, grpcServer)
+	if err != nil {
+		panic(err)
+	}
+	defer closer.Close()
 
 	// distribute the messages over clients
 	r := raindrop.NewRaindrop(&raindrop.Options{
@@ -62,10 +67,8 @@ func main() {
 	// MQ is used when send message by this function, and we suggested send message to client in this way.
 	// r.Send(ctx, data)
 
-	go grpcServer.Start(ctx)
-	go r.Start(ctx)
-	defer grpcServer.Stop(ctx)
 	defer r.Stop(ctx)
+	go r.Start(ctx)
 
 	s := make(chan os.Signal)
 	signal.Notify(s, os.Interrupt)
