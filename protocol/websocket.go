@@ -4,17 +4,9 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"time"
 
 	"github.com/coder/websocket"
 	"github.com/cro4k/raindrop/core"
-	"github.com/google/uuid"
-)
-
-const (
-	DefaultMaxWaiting = 5 * time.Second
-	XClientIDHeader   = "X-Client-Id"
-	WebsocketListenOn = ":8010"
 )
 
 type websocketConn struct {
@@ -46,31 +38,27 @@ func newWebsocketConn(id string, conn *websocket.Conn) *websocketConn {
 }
 
 type WebsocketListener struct {
-	auth func(r *http.Request) (string, error)
-
-	srv *http.Server
-
-	maxWaiting time.Duration
-
+	auth    func(r *http.Request) (string, error)
 	handler func(id string, conn core.Conn) error
 }
 
-func (l *WebsocketListener) Close() error {
-	return l.srv.Shutdown(context.Background())
+func NewWebsocketListener(auth func(r *http.Request) (string, error)) *WebsocketListener {
+	return &WebsocketListener{auth: auth, handler: func(id string, conn core.Conn) error {
+		return conn.Close()
+	}}
 }
 
-func (l *WebsocketListener) Serve(ctx context.Context, f func(id string, conn core.Conn) error) error {
-	l.handler = f
-	l.srv.Handler = l
-	slog.InfoContext(ctx, "websocket server is listening on "+l.srv.Addr)
-	return l.srv.ListenAndServe()
+func (wl *WebsocketListener) Serve(ctx context.Context, h func(id string, conn core.Conn) error) error {
+	wl.handler = h
+	return nil
 }
 
-// ServeHTTP
-// WARNING: goroutine leap
-// The current goroutine will never exit if the conn.Close() is not invoked.
-func (l *WebsocketListener) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	id, err := l.auth(r)
+func (wl *WebsocketListener) Close() error {
+	return nil
+}
+
+func (wl *WebsocketListener) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	id, err := wl.auth(r)
 	if err != nil {
 		http.Error(w, "auth error", http.StatusUnauthorized)
 		return
@@ -81,53 +69,37 @@ func (l *WebsocketListener) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cc := newWebsocketConn(id, c)
-
-	if err := l.handler(id, cc); err != nil {
+	if err := wl.handler(id, cc); err != nil {
 		// TODO
 		return
 	}
-	<-cc.Done() // goroutine leap waring
+	<-cc.Done()
 }
 
-type WebsocketListenerOption func(*WebsocketListener)
+type WebsocketServer struct {
+	auth func(r *http.Request) (string, error)
 
-func WithAuthFunc(auth func(r *http.Request) (string, error)) WebsocketListenerOption {
-	return func(l *WebsocketListener) {
-		l.auth = auth
-	}
+	srv *http.Server
 }
 
-func WithMaxWaiting(maxWaiting time.Duration) WebsocketListenerOption {
-	return func(l *WebsocketListener) {
-		l.maxWaiting = maxWaiting
+func (ws *WebsocketServer) Serve(ctx context.Context, h func(id string, conn core.Conn) error) error {
+	ws.srv.Handler = &WebsocketListener{
+		auth:    ws.auth,
+		handler: h,
 	}
+	slog.InfoContext(ctx, "websocket server is listening on"+ws.srv.Addr)
+	return ws.srv.ListenAndServe()
 }
 
-func WithListenOn(listenOn string) WebsocketListenerOption {
-	return func(listener *WebsocketListener) {
-		listener.srv.Addr = listenOn
-	}
+func (ws *WebsocketServer) Close() error {
+	return ws.srv.Shutdown(context.Background())
 }
 
-func DefaultAuth(r *http.Request) (string, error) {
-	if id := r.Header.Get(XClientIDHeader); id != "" {
-		return id, nil
+func NewWebsocketServer(addr string, auth func(r *http.Request) (string, error)) *WebsocketServer {
+	return &WebsocketServer{
+		auth: auth,
+		srv: &http.Server{
+			Addr: addr,
+		},
 	}
-	return uuid.New().String(), nil
-}
-
-func NewWebsocketListener(options ...WebsocketListenerOption) *WebsocketListener {
-	l := &WebsocketListener{
-		srv: &http.Server{Addr: WebsocketListenOn},
-	}
-	for _, option := range options {
-		option(l)
-	}
-	if l.auth == nil {
-		l.auth = DefaultAuth
-	}
-	if l.maxWaiting == 0 {
-		l.maxWaiting = DefaultMaxWaiting
-	}
-	return l
 }

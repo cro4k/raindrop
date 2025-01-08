@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 
@@ -41,7 +43,16 @@ func main() {
 
 	// hold the client connections, and write the message to target client.
 	srv := core.NewServer(
-		protocol.NewWebsocketListener(protocol.WithListenOn(httpListenOn)),
+		protocol.NewWebsocketServer(
+			httpListenOn,
+			func(r *http.Request) (string, error) {
+				id := r.Header.Get("X-Client-Id")
+				if id == "" {
+					return "", errors.New("no client id")
+				}
+				return id, nil
+			},
+		),
 		core.WithOnClientMessage(onClientMessage),
 		core.WithRegistryService(grpcListenOn, registry.FromGRPCRegistryService(registryService)),
 	)

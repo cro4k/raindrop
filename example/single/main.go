@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 
@@ -20,8 +22,15 @@ import (
 func main() {
 
 	srv := core.NewServer(
-		protocol.NewWebsocketListener(
-			protocol.WithListenOn(":8000"), // If not set, the server will listen on :8010 in default.
+		protocol.NewWebsocketServer(
+			":8010",
+			func(r *http.Request) (string, error) {
+				id := r.Header.Get("X-Client-Id")
+				if id == "" {
+					return "", errors.New("no client id")
+				}
+				return id, nil
+			},
 		),
 		core.WithOnClientMessage(onClientMessage),
 	)
