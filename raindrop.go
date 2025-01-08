@@ -6,15 +6,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cro4k/raindrop/core"
 	"golang.org/x/sync/errgroup"
 )
+
+type Server interface {
+	WriteTo(ctx context.Context, to string, data []byte) error
+	Start(ctx context.Context) error
+	Stop(ctx context.Context) error
+}
 
 type Raindrop struct {
 	pub      MessagePublisher
 	sub      MessageSubscriber
 	resolver MessageResolver
-	server   *core.Server
+	server   Server
 }
 
 type Option interface {
@@ -31,7 +36,7 @@ type Options struct {
 	MessagePublisher  MessagePublisher
 	MessageSubscriber MessageSubscriber
 	MessageResolver   MessageResolver
-	Server            *core.Server
+	Server            Server
 }
 
 func (c *Options) apply(r *Raindrop) {
@@ -65,7 +70,7 @@ func WithMessageResolver(resolver MessageResolver) OptionFunc {
 	}
 }
 
-func WithServer(server *core.Server) OptionFunc {
+func WithServer(server Server) OptionFunc {
 	return func(r *Raindrop) {
 		r.server = server
 	}
@@ -114,6 +119,8 @@ func (r *Raindrop) Start(ctx context.Context) error {
 }
 
 func (r *Raindrop) Stop(ctx context.Context) error {
-	_ = r.sub.Unsubscribe(ctx)
+	if r.sub != nil {
+		_ = r.sub.Unsubscribe(ctx)
+	}
 	return r.server.Stop(ctx)
 }

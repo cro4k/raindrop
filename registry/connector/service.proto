@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "./connector";
+
+service ConnectorService {
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc GetVersion(GetVersionRequest) returns (GetVersionResponse);
+}
+
+message SendMessageRequest {
+  string to = 1;
+  bytes data = 2;
+}
+
+message SendMessageResponse {}
+
+message GetVersionRequest {}
+
+message GetVersionResponse {
+  string version = 1;
+}

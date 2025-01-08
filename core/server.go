@@ -38,8 +38,8 @@ type options struct {
 	onClientDisconnected func(ctx context.Context, id string, cb Writer)
 	clientTimeout        time.Duration
 
-	serverIdentity any
-	clusterService ClusterService
+	serverIdentity  any
+	registryService RegistryService
 }
 
 type Option func(*options)
@@ -68,10 +68,10 @@ func WithClientTimeout(timeout time.Duration) Option {
 	}
 }
 
-func WithClusterService(identity any, service ClusterService) Option {
+func WithRegistryService(identity any, service RegistryService) Option {
 	return func(o *options) {
 		o.serverIdentity = identity
-		o.clusterService = service
+		o.registryService = service
 	}
 }
 
@@ -96,11 +96,11 @@ func (s *Server) WriteTo(ctx context.Context, to string, data []byte) error {
 		return cc.(*clientConn).Write(ctx, data)
 	}
 
-	if s.clusterService == nil {
+	if s.registryService == nil {
 		return ErrClientConnectionNotFound
 	}
 
-	w, err := s.clusterService.Discover(ctx, to)
+	w, err := s.registryService.Discover(ctx, to)
 	if err != nil {
 		return err
 	}
@@ -136,9 +136,9 @@ func (s *Server) serve(ctx context.Context, id string, cc *clientConn) {
 		_ = old.(*clientConn).Close()
 	}
 	defer s.clients.Delete(id)
-	if s.clusterService != nil {
-		defer s.clusterService.Deregister(ctx, id)
-		if err := s.clusterService.Register(ctx, id, s.serverIdentity, cc); err != nil {
+	if s.registryService != nil {
+		defer s.registryService.Deregister(ctx, id)
+		if err := s.registryService.Register(ctx, id, s.serverIdentity, cc); err != nil {
 			slog.ErrorContext(ctx, "register client conn failed", slog.String("id", id),
 				slog.String("error", err.Error()))
 			return
