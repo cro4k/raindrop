@@ -2,6 +2,7 @@ package registry
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -53,7 +54,11 @@ func (s *RedisRegistry) Deregister(ctx context.Context, id string) error {
 
 func (s *RedisRegistry) Discover(ctx context.Context, id string) (string, error) {
 	key := fmt.Sprintf("%s%s", s.prefix, id)
-	return s.client.Get(ctx, key).Result()
+	val, err := s.client.Get(ctx, key).Result()
+	if errors.Is(err, redis.Nil) {
+		return "", core.ErrClientConnectionNotFound
+	}
+	return val, err
 }
 
 func (s *RedisRegistry) register(ctx context.Context, id, host string) error {
