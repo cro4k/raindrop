@@ -111,7 +111,7 @@ func newClientConn(id string, conn Conn, opt *options, cb Writer) *clientConn {
 		ping:    make(chan struct{}),
 		onClientConnected: func(ctx context.Context) {
 			if opt.onClientConnected != nil {
-				opt.onClientDisconnected(ctx, id, cb)
+				opt.onClientConnected(ctx, id, cb)
 			}
 		},
 		onClientMessage: func(ctx context.Context, data []byte) {
